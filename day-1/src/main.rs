@@ -6,28 +6,30 @@ fn main() {
     let mut i = 0;
     let mut count: usize = 0;
     while let Some((c1, c2)) = process_line(&mut i, data) {
-        println!("{c1} {c2}");
+        #[cfg(debug_assertions)]
+        println!("{} {}", c1 as char, c2 as char);
+
         count += usize::from_str(
-            std::str::from_utf8(&[c1 as u8, c2 as u8]).unwrap()
+            std::str::from_utf8(&[c1, c2]).unwrap()
         ).unwrap();
     }
 
     println!("{count}")
 }
 
-fn process_line(i: &mut usize, chars: &[u8]) -> Option<(char, char)> {
+fn process_line(i: &mut usize, chars: &[u8]) -> Option<(u8, u8)> {
     let mut x = (None, None);
     loop {
-        let char = *chars.get(*i)? as char;
-        if char.is_numeric() {
+        let char = *chars.get(*i)?;
+        if matches!(char, b'0'..=b'9') {
             x.0 = Some(char);
             loop {
                 *i += 1;
-                let char = *chars.get(*i)? as char;
-                if char.is_numeric() {
-                    x.1 = Some(char);
-                } else if char == '\n' {
-                    break;
+                let char = *chars.get(*i)?;
+                match char {
+                    b'0'..=b'9' => x.1 = Some(char),
+                    b'\n' => break,
+                    _ => {}
                 }
             }
             break;
