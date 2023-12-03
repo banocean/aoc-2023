@@ -25,7 +25,11 @@ fn process_line(i: &mut usize, chars: &[u8]) -> Option<(u8, u8)> {
             x.0 = Some(char);
             loop {
                 *i += 1;
-                let char = *chars.get(*i)?;
+                let char = match chars.get(*i) {
+                    Some(char) => *char,
+                    None => break
+                };
+
                 match char {
                     b'0'..=b'9' => x.1 = Some(char),
                     b'\n' => break,
